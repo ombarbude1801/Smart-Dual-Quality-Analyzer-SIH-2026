@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dairy Based Smart Quality System - Nexora</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .report-table {
+      border-collapse: collapse;
+      width: 100%;
+      font-family: Arial, sans-serif;
+    }
+    .report-table th, .report-table td {
+      border: 1.5px solid #1f2937;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 13px;
+    }
+    .report-table th {
+      background-color: #f3f4f6;
+      font-weight: 700;
+      color: #111827;
+    }
+    .dark .report-table th {
+      background-color: #374151;
+      color: #f9fafb;
+      border-color: #4b5563;
+    }
+    .dark .report-table td {
+      color: #f3f4f6;
+      border-color: #4b5563;
+      background-color: #1f2937;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-report, #printable-report * { visibility: visible; }
+      #printable-report {
+        position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 15px; background: white !important; color: black !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col transition-colors duration-200 antialiased pb-20 md:pb-6">
+
+  <!-- APP TOP HEADER -->
+  <header class="bg-brand-800 dark:bg-slate-900 text-white shadow-md no-print sticky top-0 z-50 border-b border-brand-700 dark:border-slate-800">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="bg-white dark:bg-slate-800 text-brand-800 dark:text-brand-400 p-1.5 rounded-xl font-bold flex items-center justify-center shadow-sm">
+          <i data-lucide="layers" class="w-5 h-5 text-brand-700 dark:text-brand-400"></i>
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-extrabold leading-tight tracking-tight" data-i18n="app_title">Dairy Based Smart Quality System</h1>
+          <p class="text-[10px] sm:text-xs text-brand-200 dark:text-slate-400" data-i18n="app_subtitle">Automated Milk & Feed Quality Assurance • Nexora</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="p-2 rounded-xl bg-brand-900/60 dark:bg-slate-800 text-brand-100 dark:text-amber-300 hover:bg-brand-700 transition" title="Toggle Theme">
+          <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+        </button>
+
+        <div id="nav-user-profile" class="hidden flex items-center space-x-2">
+          <span id="nav-logged-user" class="text-xs bg-brand-900/80 px-2.5 py-1 rounded-lg border border-brand-600 font-medium hidden sm:inline">User</span>
+          <button onclick="logout()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg font-semibold transition" data-i18n="btn_logout">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="max-w-4xl mx-auto p-4 flex-1 w-full">
+
+    <!-- 1. AUTHENTICATION SECTION (LOGIN / CREATE ACCOUNT) -->
+    <section id="step-login" class="max-w-md mx-auto my-4 bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 transition-colors">
+      
+      <!-- Language Selector -->
+      <div class="mb-5 p-3 bg-slate-50 dark:bg-slate-800/70 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
+          <i data-lucide="globe" class="w-3.5 h-3.5 text-brand-600 dark:text-brand-400"></i>
+          <span data-i18n="lang_select_label">Choose Language / भाषा निवडा / भाषा चुनें:</span>
+        </label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="setLanguage('en')" id="lang-btn-en" class="py-1.5 text-xs font-bold rounded-xl border border-brand-600 bg-brand-600 text-white shadow-sm transition">English</button>
+          <button type="button" onclick="setLanguage('mr')" id="lang-btn-mr" class="py-1.5 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition">मराठी</button>
+          <button type="button" onclick="setLanguage('hi')" id="lang-btn-hi" class="py-1.5 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition">हिंदी</button>
+        </div>
+      </div>
+
+      <!-- Auth Switch Tabs (Login vs Create Account) -->
+      <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl mb-6">
+        <button type="button" onclick="switchAuthTab('login')" id="tab-btn-login" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white dark:bg-slate-900 text-brand-700 dark:text-brand-400 shadow-sm transition" data-i18n="tab_login">
+          Login
+        </button>
+        <button type="button" onclick="switchAuthTab('signup')" id="tab-btn-signup" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition" data-i18n="tab_signup">
+          Create Account
+        </button>
+      </div>
+
+      <!-- A) EXISTING USER LOGIN FORM -->
+      <div id="auth-view-login">
+        <div class="text-center mb-5">
+          <h2 class="text-xl font-black text-slate-900 dark:text-white" data-i18n="login_title">User Login</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="login_sub">Sign in to your account to begin testing with Nexora</p>
+        </div>
+
+        <form onsubmit="handleLogin(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" data-i18n="label_userid">User ID / Username</label>
+            <input type="text" id="login-username" value="user_nexora_dairy" required 
+                   class="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-slate-800 dark:text-slate-100 transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" data-i18n="label_password">Password</label>
+            <input type="password" id="login-password" value="••••••••" required 
+                   class="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-slate-800 dark:text-slate-100 transition" />
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center justify-center space-x-2 active:scale-95 mt-2">
+            <span data-i18n="btn_login">Login</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <p class="text-center text-xs text-slate-500 mt-4">
+          <span data-i18n="new_user_prompt">New user?</span> 
+          <a href="javascript:void(0)" onclick="switchAuthTab('signup')" class="text-brand-600 dark:text-brand-400 font-bold hover:underline" data-i18n="create_account_link">Create Account</a>
+        </p>
+      </div>
+
+      <!-- B) NEW USER CREATE ACCOUNT (SIGN UP) FORM -->
+      <div id="auth-view-signup" class="hidden">
+        <div class="text-center mb-4">
+          <h2 class="text-xl font-black text-slate-900 dark:text-white" data-i18n="signup_title">Create Account</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="signup_sub">Join Nexora Dairy Quality System</p>
+        </div>
+
+        <!-- 1. Google One-Click Join Button -->
+        <button type="button" onclick="handleGoogleJoin()" class="w-full py-2.5 px-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl shadow-sm transition flex items-center justify-center space-x-3 active:scale-95">
+          <!-- Official Google SVG Logo -->
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span data-i18n="btn_google_join">Join using Google Account</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="relative my-4 text-center">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200 dark:border-slate-800"></div></div>
+          <span class="relative bg-white dark:bg-slate-900 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400" data-i18n="divider_or">OR JOIN USING MOBILE</span>
+        </div>
+
+        <!-- Signup Credentials Form -->
+        <form onsubmit="handleCreateAccount(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" data-i18n="label_mobile">Mobile Number</label>
+            <div class="relative">
+              <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">+91</span>
+              <input type="tel" id="signup-mobile" placeholder="98765 43210" pattern="[0-9]{10}" required 
+                     class="w-full pl-11 pr-4 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-slate-800 dark:text-slate-100 transition" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" data-i18n="label_create_username">Create Username</label>
+            <input type="text" id="signup-username" placeholder="Choose a username" required 
+                   class="w-full px-4 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-slate-800 dark:text-slate-100 transition" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" data-i18n="label_create_password">Create Password</label>
+            <input type="password" id="signup-password" placeholder="Create a strong password" required minlength="4" 
+                   class="w-full px-4 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-slate-800 dark:text-slate-100 transition" />
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-black text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2 active:scale-95 mt-4">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span data-i18n="btn_create_account">Create Account (OK)</span>
+          </button>
+        </form>
+
+        <p class="text-center text-xs text-slate-500 mt-3">
+          <span data-i18n="already_have_account">Already have an account?</span> 
+          <a href="javascript:void(0)" onclick="switchAuthTab('login')" class="text-brand-600 dark:text-brand-400 font-bold hover:underline" data-i18n="tab_login">Login</a>
+        </p>
+      </div>
+
+    </section>
+
+    <!-- 2. HOME / USER DASHBOARD -->
+    <section id="step-dashboard" class="hidden space-y-6">
+
+      <!-- TOP SECTION: CONNECT NEXORA DEVICE -->
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-200 dark:border-slate-800 transition">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div id="home-device-icon-box" class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-inner">
+              <i data-lucide="bluetooth" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500" data-i18n="iot_scanner_tag">HARDWARE INTERFACE</span>
+              <h3 class="text-lg font-black text-slate-900 dark:text-white" data-i18n="connect_device_heading">CONNECT NEXORA DEVICE</h3>
+              <p id="home-device-status-text" class="text-xs text-rose-500 font-semibold flex items-center gap-1.5 mt-0.5">
+                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                <span data-i18n="device_disconnected">Nexora: Disconnected</span>
+              </p>
+            </div>
+          </div>
+
+          <div id="home-device-action-container">
+            <button onclick="goToStep('step-connect')" class="w-full sm:w-auto px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow transition flex items-center justify-center space-x-2 active:scale-95">
+              <i data-lucide="link" class="w-4 h-4"></i>
+              <span data-i18n="btn_connect_now">CONNECT NEXORA NOW</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-1 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <p data-i18n="device_instruction_banner">Connect the Nexora NIR scanner to analyze Milk, Feed, or Silage samples.</p>
+          <button id="btn-quick-start-scan" disabled onclick="goToStep('step-sample-select')" class="w-full sm:w-auto px-5 py-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-bold rounded-xl transition flex items-center justify-center space-x-2 cursor-not-allowed">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            <span data-i18n="btn_start_new_scan">START SCAN</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- BELOW SECTION: TEST HISTORY TABLE -->
+      <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-md border border-slate-200 dark:border-slate-800 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div>
+            <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="history" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+              <span data-i18n="history_title">TEST HISTORY</span>
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="history_desc_home">Real-time log of your scanned samples and quality results.</p>
+          </div>
+          
+          <button onclick="goToStep('step-report')" class="px-4 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span data-i18n="btn_generate_report">GENERATE REPORT</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border-b border-slate-200 dark:border-slate-700">
+              <tr>
+                <th class="p-3 font-bold">Sample ID</th>
+                <th class="p-3 font-bold">Feed Type</th>
+                <th class="p-3 font-bold">Moisture</th>
+                <th class="p-3 font-bold">Protein</th>
+                <th class="p-3 font-bold">Fiber</th>
+                <th class="p-3 font-bold">Aflatoxin</th>
+                <th class="p-3 font-bold">pH</th>
+                <th class="p-3 font-bold">Adulteration</th>
+                <th class="p-3 font-bold">Status</th>
+              </tr>
+            </thead>
+            <tbody id="home-history-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div id="history-empty-state" class="py-12 text-center">
+            <div class="w-14 h-14 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="inbox" class="w-7 h-7"></i>
+            </div>
+            <p class="text-sm font-bold text-slate-700 dark:text-slate-300" data-i18n="no_history_yet">No test history recorded yet</p>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="no_history_sub">Connect Nexora and click 'START SCAN' to generate your first test.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. CONNECT NEXORA DEVICE -->
+    <section id="step-connect" class="hidden max-w-lg mx-auto bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
+        <h3 class="text-base font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+          <i data-lucide="radio" class="w-5 h-5 text-brand-600 dark:text-brand-400"></i>
+          <span data-i18n="btn_connect_device">CONNECT NEXORA DEVICE</span>
+        </h3>
+        <button onclick="goToStep('step-dashboard')" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="text-center py-6">
+        <div class="relative w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+          <div class="absolute inset-0 rounded-full border-4 border-brand-300 dark:border-brand-700 animate-ping opacity-60"></div>
+          <div class="w-20 h-20 rounded-full bg-brand-100 dark:bg-slate-800 flex items-center justify-center text-brand-700 dark:text-brand-400 shadow-inner">
+            <i data-lucide="cpu" class="w-10 h-10"></i>
+          </div>
+        </div>
+        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200" data-i18n="searching_device">Searching for nearby Nexora sensors...</h4>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" data-i18n="searching_device_sub">Ensure Bluetooth / WiFi is enabled on your Nexora device.</p>
+      </div>
+
+      <div class="space-y-3 mt-2">
+        <div class="p-4 border border-brand-300 dark:border-brand-800 rounded-2xl bg-brand-50 dark:bg-slate-800/60 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="hard-drive" class="w-6 h-6 text-brand-700 dark:text-brand-400"></i>
+            <div>
+              <p class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Nexora Smart Sensor v2.4</p>
+              <p class="text-[11px] text-brand-700 dark:text-brand-300">Battery: 96% | Signal: Strong (-48 dBm)</p>
+            </div>
+          </div>
+          <button id="btn-pair-device" onclick="pairDevice()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition active:scale-95">
+            Pair Nexora
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SELECT SAMPLE -->
+    <section id="step-sample-select" class="hidden space-y-6">
+      <div class="text-center">
+        <span class="text-xs font-bold tracking-wider text-brand-700 dark:text-brand-400 uppercase bg-brand-100 dark:bg-slate-800 px-3 py-1 rounded-full" data-i18n="step_1">Step 1</span>
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-2" data-i18n="select_sample_title">Select Sample</h2>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400" data-i18n="select_sample_sub">Choose the target substance to analyze with Nexora:</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+        <div onclick="selectSampleType('Milk')" class="cursor-pointer group bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 hover:border-brand-500 rounded-3xl p-6 text-center shadow-sm hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="w-16 h-16 bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 group-hover:text-white transition">
+            <i data-lucide="milk" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="sample_milk">Milk</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2" data-i18n="sample_milk_desc">Fat, SNF, water dilution, urea, and pH analysis.</p>
+        </div>
+
+        <div onclick="selectSampleType('Feed')" class="cursor-pointer group bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 hover:border-brand-500 rounded-3xl p-6 text-center shadow-sm hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="w-16 h-16 bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-600 group-hover:text-white transition">
+            <i data-lucide="wheat" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="sample_feed">Feed</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2" data-i18n="sample_feed_desc">Protein, fiber, moisture, aflatoxin, and sand adulteration.</p>
+        </div>
+
+        <div onclick="selectSampleType('Silage')" class="cursor-pointer group bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 hover:border-brand-500 rounded-3xl p-6 text-center shadow-sm hover:shadow-xl transition transform hover:-translate-y-1">
+          <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-600 group-hover:text-white transition">
+            <i data-lucide="sprout" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white" data-i18n="sample_silage">Silage</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2" data-i18n="sample_silage_desc">Fermentation quality, mould detection, pH, and moisture.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. INSERT SAMPLE -->
+    <section id="step-insert-sample" class="hidden max-w-md mx-auto bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 text-center space-y-6">
+      <span class="text-xs font-bold tracking-wider text-brand-700 dark:text-brand-400 uppercase bg-brand-100 dark:bg-slate-800 px-3 py-1 rounded-full" data-i18n="step_2">Step 2</span>
+      <h2 class="text-2xl font-bold text-slate-900 dark:text-white" data-i18n="insert_sample_title">Insert Sample</h2>
+      
+      <div class="p-6 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700">
+        <div class="w-18 h-18 bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 rounded-full flex items-center justify-center mx-auto mb-3 animate-bounce">
+          <i data-lucide="arrow-down-circle" class="w-10 h-10"></i>
+        </div>
+        <p class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200" id="insert-instruction-text">
+          Place sample cartridge in the Nexora sensor bay and close the chamber hatch.
+        </p>
+        <p class="text-[11px] text-slate-400 mt-1">Nexora Chamber Slot #1: Ready for Insertion</p>
+      </div>
+
+      <div class="flex items-center justify-center space-x-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-slate-800 py-2.5 px-4 rounded-xl">
+        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+        <span data-i18n="sample_detected">Sample detected & positioned in Nexora</span>
+      </div>
+
+      <!-- 6. START SCAN BUTTON -->
+      <button onclick="startScan()" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-black rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-sm active:scale-95">
+        <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+        <span data-i18n="btn_start_scan">START SCAN</span>
+      </button>
+    </section>
+
+    <!-- 7. LIVE SENSOR READINGS & 8. AI PROCESSING -->
+    <section id="step-scanning" class="hidden max-w-2xl mx-auto bg-white dark:bg-slate-900 p-7 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 space-y-6">
+      <div class="text-center">
+        <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center justify-center gap-2">
+          <i data-lucide="activity" class="w-6 h-6 text-brand-600 dark:text-brand-400 animate-spin"></i>
+          <span data-i18n="live_readings_title">LIVE SENSOR READINGS</span>
+        </h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" data-i18n="live_readings_sub">Acquiring Nexora multi-spectral & electrochemical data streams...</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">NIR Spectrum</p>
+          <p id="live-nir" class="text-lg font-mono font-bold text-brand-700 dark:text-brand-400">1450 nm</p>
+        </div>
+        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Conductivity</p>
+          <p id="live-cond" class="text-lg font-mono font-bold text-blue-600 dark:text-blue-400">4.2 mS/cm</p>
+        </div>
+        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Optical Density</p>
+          <p id="live-od" class="text-lg font-mono font-bold text-indigo-600 dark:text-indigo-400">0.82</p>
+        </div>
+        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Temperature</p>
+          <p id="live-temp" class="text-lg font-mono font-bold text-slate-700 dark:text-slate-300">27.4 °C</p>
+        </div>
+        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">pH Level</p>
+          <p id="live-ph" class="text-lg font-mono font-bold text-teal-600 dark:text-teal-400">6.4</p>
+        </div>
+        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Nexora Link</p>
+          <p class="text-lg font-mono font-bold text-emerald-600">99.8%</p>
+        </div>
+      </div>
+
+      <div class="p-5 bg-brand-50 dark:bg-slate-800/80 rounded-2xl border border-brand-200 dark:border-slate-700 space-y-3">
+        <div class="flex items-center justify-between text-xs font-bold text-brand-900 dark:text-brand-300">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-brand-600 dark:text-brand-400"></i>
+            <span id="ai-process-status" data-i18n="ai_processing_label">AI PROCESSING: Extracting chemical fingerprint...</span>
+          </span>
+          <span id="ai-progress-text">0%</span>
+        </div>
+        <div class="w-full bg-brand-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+          <div id="ai-progress-bar" class="bg-brand-600 h-3 rounded-full transition-all duration-300 w-0"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. QUALITY SCORE, RISK ANALYSIS & AI RECOMMENDATION -->
+    <section id="step-results" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
+        
+        <!-- Top Status Alert Banner -->
+        <div id="res-status-banner" class="mb-5 p-3 rounded-2xl flex items-center justify-between text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+          <span class="flex items-center gap-2">
+            <i id="res-banner-icon" data-lucide="check-circle" class="w-4 h-4"></i>
+            <span id="res-banner-msg">Scan #1: Pure Sample Verified (कोणतीही भेसळ नाही)</span>
+          </span>
+          <span id="res-scan-badge" class="px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-800 text-[10px]">Test 1</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span id="res-sample-badge" class="px-2.5 py-1 bg-brand-100 dark:bg-slate-800 text-brand-800 dark:text-brand-300 rounded-md text-xs font-bold">Pure Cow Milk</span>
+              <span id="res-sample-id" class="text-xs text-slate-400 font-mono">Sample #F001</span>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1" data-i18n="results_title">Quality Assessment & Diagnostic</h2>
+          </div>
+          <!-- Quality Score Pill -->
+          <div class="flex items-center space-x-3 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <div class="text-right">
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase" data-i18n="quality_score_badge">QUALITY SCORE</p>
+              <p id="res-status-text" class="text-xs font-black text-emerald-600">Good</p>
+            </div>
+            <div id="res-score-circle" class="w-12 h-12 rounded-full bg-emerald-600 text-white font-black text-lg flex items-center justify-center p-2 shadow">
+              94
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 Metrics matching report table -->
+        <div class="grid grid-cols-2 sm:grid-cols-6 gap-2.5 py-5">
+          <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Moisture (%)</p>
+            <p id="res-moisture" class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5">87%</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Protein (%)</p>
+            <p id="res-protein" class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5">3.4%</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Fiber (%)</p>
+            <p id="res-fiber" class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5">0%</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Aflatoxin (ppb)</p>
+            <p id="res-aflatoxin" class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5">0 ppb</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">pH</p>
+            <p id="res-ph" class="text-base font-bold text-slate-800 dark:text-slate-100 mt-0.5">6.7</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Adulteration</p>
+            <p id="res-adulteration" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">None</p>
+          </div>
+        </div>
+
+        <!-- Risk Analysis & AI Recommendation -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div id="res-risk-card" class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-2xl space-y-1">
+            <h4 class="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-600"></i>
+              <span data-i18n="risk_analysis_title">Risk Analysis</span>
+            </h4>
+            <p id="res-risk-analysis" class="text-[11px] text-emerald-800 dark:text-emerald-200/90 leading-relaxed">
+              Safe sample verified by Nexora.
+            </p>
+          </div>
+
+          <div id="res-rec-card" class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 rounded-2xl space-y-1">
+            <h4 class="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+              <i data-lucide="bot" class="w-4 h-4 text-emerald-600"></i>
+              <span data-i18n="ai_recommendation_title">AI Recommendation</span>
+            </h4>
+            <p id="res-ai-recommendation" class="text-[11px] text-emerald-800 dark:text-emerald-200/90 leading-relaxed">
+              Grade A quality.
+            </p>
+          </div>
+        </div>
+
+        <!-- 10. SAVE TEST BUTTON -->
+        <div class="flex flex-wrap items-center justify-end gap-3 mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
+          <button onclick="goToStep('step-sample-select')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition" data-i18n="btn_retest">
+            Retest / New Sample
+          </button>
+          <button onclick="saveCurrentTest()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center space-x-2 active:scale-95">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span data-i18n="btn_save_test">SAVE TEST TO HISTORY</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. GENERATE REPORT (EXACT REPLICA OF THE UPLOADED IMAGE) -->
+    <section id="step-report" class="hidden space-y-5">
+      <div class="no-print flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <button onclick="goToStep('step-dashboard')" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center space-x-1">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span data-i18n="btn_back">Back to Home</span>
+        </button>
+        <div class="flex space-x-2">
+          <button onclick="downloadCSV()" class="px-3.5 py-2 bg-slate-800 dark:bg-slate-700 text-white rounded-xl text-xs font-bold hover:bg-slate-900 flex items-center space-x-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Download CSV</span>
+          </button>
+          <button onclick="window.print()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow flex items-center space-x-1.5">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Print Report (PDF)</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="printable-report" class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-800 max-w-4xl mx-auto">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-3" style="font-family: Arial, sans-serif;">Dummy Data Set</h2>
+
+        <div class="overflow-x-auto">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th style="width: 11%;">Feed<br/>Sample ID</th>
+                <th style="width: 14%;">Feed Type</th>
+                <th style="width: 10%;">Moisture<br/>(%)</th>
+                <th style="width: 10%;">Protein<br/>(%)</th>
+                <th style="width: 9%;">Fiber<br/>(%)</th>
+                <th style="width: 11%;">Aflatoxin<br/>(ppb)</th>
+                <th style="width: 7%;">pH</th>
+                <th style="width: 16%;">Adulteration<br/>Detected</th>
+                <th style="width: 12%;">Quality Status</th>
+              </tr>
+            </thead>
+            <tbody id="report-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400 flex justify-between">
+          <span>Dairy Based Smart Quality System • Nexora Analysis</span>
+          <span>Generated On: <span id="report-gen-time"></span></span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- APP BOTTOM NAVIGATION BAR -->
+  <nav id="app-bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-200 dark:border-slate-800 py-2 z-40 no-print">
+    <div class="max-w-md mx-auto grid grid-cols-3 text-center text-xs">
+      <button onclick="goToStep('step-dashboard')" class="flex flex-col items-center justify-center space-y-1 text-brand-600 dark:text-brand-400 font-bold">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span data-i18n="nav_home">Home</span>
+      </button>
+      <button onclick="handleScanNavClick()" class="flex flex-col items-center justify-center space-y-1 text-slate-500 dark:text-slate-400 hover:text-brand-600">
+        <i data-lucide="scan" class="w-5 h-5"></i>
+        <span data-i18n="nav_scan">Scan</span>
+      </button>
+      <button onclick="goToStep('step-report')" class="flex flex-col items-center justify-center space-y-1 text-slate-500 dark:text-slate-400 hover:text-brand-600">
+        <i data-lucide="file-text" class="w-5 h-5"></i>
+        <span data-i18n="nav_report">Report</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- JAVASCRIPT APP LOGIC & TRANSLATIONS -->
+  <script>
+    let dataset = []; // Empty by default
+    let scanCount = 0; // 1 = Pure, 2 = Adulterated
+    let loggedInUsername = "user_nexora_dairy";
+
+    let currentSelectedSample = 'Milk';
+    let currentTestResult = null;
+    let isDeviceConnected = false;
+    let currentLang = 'en';
+
+    const translations = {
+      en: {
+        app_title: "Dairy Based Smart Quality System",
+        app_subtitle: "Automated Milk & Feed Quality Assurance • Nexora",
+        tab_login: "Login",
+        tab_signup: "Create Account",
+        login_title: "User Login",
+        login_sub: "Sign in to your account to begin testing with Nexora",
+        signup_title: "Create Account",
+        signup_sub: "Join Nexora Dairy Quality System",
+        lang_select_label: "Choose Language / भाषा निवडा / भाषा चुनें:",
+        label_userid: "User ID / Username",
+        label_password: "Password",
+        btn_login: "Login",
+        btn_logout: "Logout",
+        new_user_prompt: "New user?",
+        create_account_link: "Create Account",
+        already_have_account: "Already have an account?",
+        btn_google_join: "Continue with Google Account",
+        divider_or: "OR JOIN USING MOBILE",
+        label_mobile: "Mobile Number",
+        label_create_username: "Create Username",
+        label_create_password: "Create Password",
+        btn_create_account: "Create Account (OK)",
+        device_disconnected: "Nexora: Disconnected",
+        device_connected: "Nexora: Connected (NX-2026)",
+        iot_scanner_tag: "HARDWARE INTERFACE",
+        connect_device_heading: "CONNECT NEXORA DEVICE",
+        btn_connect_now: "CONNECT NEXORA NOW",
+        device_instruction_banner: "Connect the Nexora NIR scanner to analyze Milk, Feed, or Silage samples.",
+        btn_start_new_scan: "START SCAN",
+        history_title: "TEST HISTORY",
+        history_desc_home: "Real-time log of your scanned samples and quality results.",
+        btn_generate_report: "GENERATE REPORT",
+        no_history_yet: "No test history recorded yet",
+        no_history_sub: "Connect Nexora and click 'START SCAN' to generate your first test.",
+        btn_connect_device: "CONNECT NEXORA DEVICE",
+        searching_device: "Searching for nearby Nexora sensors...",
+        searching_device_sub: "Ensure Bluetooth / WiFi is enabled on your Nexora device.",
+        step_1: "Step 1",
+        select_sample_title: "Select Sample",
+        select_sample_sub: "Choose the target substance to analyze with Nexora:",
+        sample_milk: "Milk",
+        sample_milk_desc: "Fat, SNF, water dilution, urea, and pH analysis.",
+        sample_feed: "Feed",
+        sample_feed_desc: "Protein, fiber, moisture, aflatoxin, and sand adulteration.",
+        sample_silage: "Silage",
+        sample_silage_desc: "Fermentation quality, mould detection, pH, and moisture.",
+        step_2: "Step 2",
+        insert_sample_title: "Insert Sample",
+        sample_detected: "Sample detected & positioned in Nexora",
+        btn_start_scan: "START SCAN",
+        live_readings_title: "LIVE SENSOR READINGS",
+        live_readings_sub: "Acquiring Nexora multi-spectral & electrochemical data streams...",
+        ai_processing_label: "AI PROCESSING: Extracting chemical fingerprint...",
+        results_title: "Quality Assessment & Diagnostic",
+        quality_score_badge: "QUALITY SCORE",
+        risk_analysis_title: "Risk Analysis",
+        ai_recommendation_title: "AI Recommendation",
+        btn_retest: "Retest / New Sample",
+        btn_save_test: "SAVE TEST TO HISTORY",
+        btn_back: "Back to Home",
+        nav_home: "Home",
+        nav_scan: "Scan",
+        nav_report: "Report"
+      },
+      mr: {
+        app_title: "डेअरी आधारित स्मार्ट गुणवत्ता प्रणाली",
+        app_subtitle: "स्वयंचलित दूध व पशुआहार गुणवत्ता हमी • Nexora",
+        tab_login: "लॉगिन करा",
+        tab_signup: "नवीन खाते तयार करा",
+        login_title: "युझर लॉगिन (User Login)",
+        login_sub: "Nexora द्वारे चाचणी सुरू करण्यासाठी खात्यात लॉगिन करा",
+        signup_title: "नवीन खाते तयार करा (Sign Up)",
+        signup_sub: "Nexora डेअरी प्रणालीमध्ये सामील व्हा",
+        lang_select_label: "भाषा निवडा (Choose Language):",
+        label_userid: "युझर आयडी / युझरनेम",
+        label_password: "पासवर्ड",
+        btn_login: "लॉगिन करा",
+        btn_logout: "लॉगआउट",
+        new_user_prompt: "नवीन युझर आहात?",
+        create_account_link: "खाते तयार करा",
+        already_have_account: "आधीच खाते आहे?",
+        btn_google_join: "Google खात्याद्वारे जोडा",
+        divider_or: "किंवा मोबाईल नंबरद्वारे जोडा",
+        label_mobile: "मोबाईल नंबर",
+        label_create_username: "युझरनेम तयार करा",
+        label_create_password: "पासवर्ड तयार करा",
+        btn_create_account: "खाते तयार करा (OK)",
+        device_disconnected: "Nexora: डिस्कनेक्टेड",
+        device_connected: "Nexora: कनेक्टेड (NX-2026)",
+        iot_scanner_tag: "हार्डवेअर इंटरफेस",
+        connect_device_heading: "CONNECT NEXORA DEVICE",
+        btn_connect_now: "Nexora कनेक्ट करा",
+        device_instruction_banner: "दूध, पशुआहार किंवा मुरघास तपासण्यासाठी Nexora सेन्सर जोडा.",
+        btn_start_new_scan: "स्कॅन सुरू करा",
+        history_title: "TEST HISTORY (चाचणी इतिहास)",
+        history_desc_home: "तुम्ही घेतलेल्या सर्व चाचण्या आणि गुणवत्ता निकालांची नोंद.",
+        btn_generate_report: "GENERATE REPORT",
+        no_history_yet: "अद्याप कोणतीही चाचणी नोंदवलेली नाही",
+        no_history_sub: "प्रथम Nexora डिव्हाइस जोडा आणि 'START SCAN' वर क्लिक करून पहिली चाचणी घ्या.",
+        btn_connect_device: "NEXORA डिव्हाइस कनेक्ट करा",
+        searching_device: "जवळपासचे Nexora सेन्सर शोधत आहे...",
+        searching_device_sub: "तुमच्या Nexora उपकरणावर ब्लूटूथ / वायफाय सुरू असल्याची खात्री करा.",
+        step_1: "पायरी १",
+        select_sample_title: "नमुना निवडा (Select Sample)",
+        select_sample_sub: "Nexora द्वारे तपासणीसाठी योग्य पदार्थ निवडा:",
+        sample_milk: "दूध (Milk)",
+        sample_milk_desc: "फॅट, एसएनएफ, पाणी, युरिया व आम्लता (pH) तपासणी.",
+        sample_feed: "पशुआहार (Feed)",
+        sample_feed_desc: "प्रथिने, फायबर, ओलावा, अफ्लाटॉक्सिन व वाळू भेसळ तपासणी.",
+        sample_silage: "मुरघास (Silage)",
+        sample_silage_desc: "किण्वन गुणवत्ता, बुरशी, pH आणि ओलावा तपासणी.",
+        step_2: "पायरी २",
+        insert_sample_title: "नमुना उपकरणात ठेवा (Insert Sample)",
+        sample_detected: "Nexora सेन्सरने नमुना स्वीकारला आहे",
+        btn_start_scan: "स्कॅन सुरू करा (START SCAN)",
+        live_readings_title: "लाईव्ह सेन्सर रिडिंग्स (LIVE READINGS)",
+        live_readings_sub: "Nexora स्पेक्ट्रल व बायोकेमिकल सेन्सर्सकडून डेटा गोळा होत आहे...",
+        ai_processing_label: "AI प्रोसेस: रासायनिक विश्लेषक मॉडेल सुरू आहे...",
+        results_title: "गुणवत्ता निकाल व विश्लेषण",
+        quality_score_badge: "गुणवत्ता स्कोअर",
+        risk_analysis_title: "धोका विश्लेषण (Risk Analysis)",
+        ai_recommendation_title: "AI सल्ला (Recommendation)",
+        btn_retest: "पुन्हा चाचणी घ्या",
+        btn_save_test: "चाचणी इतिहासात जतन करा",
+        btn_back: "होम पेजवर जा",
+        nav_home: "होम",
+        nav_scan: "स्कॅन",
+        nav_report: "रिपोर्ट"
+      },
+      hi: {
+        app_title: "डेयरी आधारित स्मार्ट गुणवत्ता प्रणाली",
+        app_subtitle: "स्वचालित दूध एवं चारा गुणवत्ता आश्वासन • Nexora",
+        tab_login: "लॉगिन करें",
+        tab_signup: "नया खाता बनाएं",
+        login_title: "उपयोगकर्ता लॉगिन (User Login)",
+        login_sub: "Nexora द्वारा जांच शुरू करने के लिए अपने खाते में साइन इन करें",
+        signup_title: "नया खाता बनाएं (Sign Up)",
+        signup_sub: "Nexora डेयरी प्रणाली में शामिल हों",
+        lang_select_label: "भाषा चुनें (Choose Language):",
+        label_userid: "यूजर आईडी / यूजरनेम",
+        label_password: "पासवर्ड",
+        btn_login: "लॉगिन करें",
+        btn_logout: "लॉगआउट",
+        new_user_prompt: "नए उपयोगकर्ता हैं?",
+        create_account_link: "खाता बनाएं",
+        already_have_account: "पहले से खाता है?",
+        btn_google_join: "Google खाते से जुड़ें",
+        divider_or: "अथवा मोबाइल नंबर से जुड़ें",
+        label_mobile: "मोबाइल नंबर",
+        label_create_username: "यूजरनेम बनाएं",
+        label_create_password: "पासवर्ड बनाएं",
+        btn_create_account: "खाता बनाएं (OK)",
+        device_disconnected: "Nexora: डिस्कनेक्टेड",
+        device_connected: "Nexora: कनेक्टेड (NX-2026)",
+        iot_scanner_tag: "हार्डवेयर इंटरफेस",
+        connect_device_heading: "CONNECT NEXORA DEVICE",
+        btn_connect_now: "Nexora डिवाइस कनेक्ट करें",
+        device_instruction_banner: "दूध, चारा या साइलेज की जांच के लिए Nexora सेंसर कनेक्ट करें।",
+        btn_start_new_scan: "स्कैन शुरू करें",
+        history_title: "TEST HISTORY (परीक्षण इतिहास)",
+        history_desc_home: "आपके द्वारा किए गए सभी नमूनों और गुणवत्ता परिणामों का रिकॉर्ड।",
+        btn_generate_report: "GENERATE REPORT",
+        no_history_yet: "अभी तक कोई परीक्षण रिकॉर्ड नहीं किया गया है",
+        no_history_sub: "Nexora कनेक्ट करें और पहला परीक्षण दर्ज करने के लिए 'START SCAN' पर क्लिक करें।",
+        btn_connect_device: "NEXORA डिवाइस कनेक्ट करें",
+        searching_device: "Nexora सेंसर डिवाइस की खोज जारी है...",
+        searching_device_sub: "कृपया Nexora डिवाइस में ब्लूटूथ या वाईफाई चालू रखें।",
+        step_1: "चरण १",
+        select_sample_title: "नमूना चुनें (Select Sample)",
+        select_sample_sub: "Nexora से जांच के लिए सामग्री का चयन करें:",
+        sample_milk: "दूध (Milk)",
+        sample_milk_desc: "फैट, एसएनएफ, पानी, यूरिया व पीएच (pH) जांच।",
+        sample_feed: "पशु आहार (Feed)",
+        sample_feed_desc: "प्रोटीन, फाइबर, नमी, एफ्लाटॉक्सिन व रेत मिलावट जांच।",
+        sample_silage: "साइलेज / मुरघास (Silage)",
+        sample_silage_desc: "किण्वन गुणवत्ता, फफूंद (Mould), pH और नमी विश्लेषण।",
+        step_2: "चरण २",
+        insert_sample_title: "नमूना स्लॉट में रखें (Insert Sample)",
+        sample_detected: "Nexora सेंसर द्वारा नमूना पहचान लिया गया है",
+        btn_start_scan: "स्कैन शुरू करें (START SCAN)",
+        live_readings_title: "लाइव सेंसर रीडिंग (LIVE READINGS)",
+        live_readings_sub: "Nexora मल्टी-स्पेक्ट्रल सेंसर से लाइव डेटा प्राप्त हो रहा है...",
+        ai_processing_label: "AI प्रोसेसिंग: रासायनिक संरचना का विश्लेषण जारी...",
+        results_title: "गुणवत्ता परिणाम एवं विश्लेषण",
+        quality_score_badge: "गुणवत्ता स्कोर",
+        risk_analysis_title: "जोखिम विश्लेषण (Risk Analysis)",
+        ai_recommendation_title: "AI सुझाव (Recommendation)",
+        btn_retest: "पुनः जांच करें",
+        btn_save_test: "परीक्षण इतिहास में सेव करें",
+        btn_back: "होम पर वापस जाएं",
+        nav_home: "होम",
+        nav_scan: "स्कैन",
+        nav_report: "रिपोर्ट"
+      }
+    };
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      const dict = translations[lang];
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.innerText = dict[key];
+      });
+
+      ['en', 'mr', 'hi'].forEach(l => {
+        const btn = document.getElementById(`lang-btn-${l}`);
+        if (btn) {
+          if (l === lang) {
+            btn.className = "py-1.5 text-xs font-bold rounded-xl border border-brand-600 bg-brand-600 text-white shadow-sm transition";
+          } else {
+            btn.className = "py-1.5 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition";
+          }
+        }
+      });
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      lucide.createIcons();
+    }
+
+    // SWITCH BETWEEN LOGIN & SIGN UP
+    function switchAuthTab(mode) {
+      const loginView = document.getElementById('auth-view-login');
+      const signupView = document.getElementById('auth-view-signup');
+      const tabLogin = document.getElementById('tab-btn-login');
+      const tabSignup = document.getElementById('tab-btn-signup');
+
+      if (mode === 'signup') {
+        loginView.classList.add('hidden');
+        signupView.classList.remove('hidden');
+
+        tabSignup.className = "flex-1 py-2 text-xs font-bold rounded-xl bg-white dark:bg-slate-900 text-brand-700 dark:text-brand-400 shadow-sm transition";
+        tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+      } else {
+        signupView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+
+        tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-xl bg-white dark:bg-slate-900 text-brand-700 dark:text-brand-400 shadow-sm transition";
+        tabSignup.className = "flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+      }
+      lucide.createIcons();
+    }
+
+    // CREATE ACCOUNT VIA MOBILE & CREDENTIALS
+    function handleCreateAccount(e) {
+      e.preventDefault();
+      const user = document.getElementById('signup-username').value.trim();
+      const pass = document.getElementById('signup-password').value.trim();
+      const mobile = document.getElementById('signup-mobile').value.trim();
+
+      if (!user || !pass || !mobile) {
+        alert("Please complete all details / कृपया सर्व माहिती भरा.");
+        return;
+      }
+
+      loggedInUsername = user;
+      document.getElementById('nav-logged-user').innerText = loggedInUsername;
+
+      const successMsg = currentLang === 'mr' ? `अभिनंदन! खाते यशस्वीरित्या तयार झाले. स्वागत आहे, ${loggedInUsername}!` :
+                         currentLang === 'hi' ? `बधाई हो! खाता सफलतापूर्वक बन गया है। स्वागत है, ${loggedInUsername}!` :
+                         `Congratulations! Account created successfully. Welcome, ${loggedInUsername}!`;
+      alert(successMsg);
+
+      // Successfully log in & redirect to dashboard
+      document.getElementById('nav-user-profile').classList.remove('hidden');
+      document.getElementById('app-bottom-nav').classList.remove('hidden');
+      goToStep('step-dashboard');
+    }
+
+    // JOIN VIA GOOGLE SIMULATION
+    function handleGoogleJoin() {
+      const googleUser = "DairyUser_Google";
+      const confirmJoin = currentLang === 'mr' ? "Google खात्याद्वारे जोडणी प्रमाणित करत आहे..." :
+                          currentLang === 'hi' ? "Google खाते से जुड़ने की पुष्टि की जा रही है..." :
+                          "Connecting with Google Account (demo@gmail.com)...";
+      alert(confirmJoin);
+
+      // Auto populate signup form or direct log in
+      document.getElementById('signup-mobile').value = "9822012345";
+      document.getElementById('signup-username').value = googleUser;
+      document.getElementById('signup-password').value = "google@123";
+
+      loggedInUsername = googleUser;
+      document.getElementById('nav-logged-user').innerText = loggedInUsername;
+
+      document.getElementById('nav-user-profile').classList.remove('hidden');
+      document.getElementById('app-bottom-nav').classList.remove('hidden');
+      goToStep('step-dashboard');
+    }
+
+    // LOGIN & LOGOUT
+    function handleLogin(e) {
+      e.preventDefault();
+      loggedInUsername = document.getElementById('login-username').value.trim() || "user_nexora_dairy";
+      document.getElementById('nav-logged-user').innerText = loggedInUsername;
+
+      document.getElementById('nav-user-profile').classList.remove('hidden');
+      document.getElementById('app-bottom-nav').classList.remove('hidden');
+      goToStep('step-dashboard');
+    }
+
+    function logout() {
+      document.getElementById('nav-user-profile').classList.add('hidden');
+      document.getElementById('app-bottom-nav').classList.add('hidden');
+      switchAuthTab('login');
+      goToStep('step-login');
+    }
+
+    // NAVIGATION
+    const steps = [
+      'step-login',
+      'step-dashboard',
+      'step-connect',
+      'step-sample-select',
+      'step-insert-sample',
+      'step-scanning',
+      'step-results',
+      'step-report'
+    ];
+
+    function goToStep(id) {
+      steps.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.classList.add('hidden');
+      });
+      const target = document.getElementById(id);
+      if (target) target.classList.remove('hidden');
+
+      if (id === 'step-dashboard') renderHomeHistoryTable();
+      if (id === 'step-report') renderReportTable();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function handleScanNavClick() {
+      if (!isDeviceConnected) {
+        goToStep('step-connect');
+      } else {
+        goToStep('step-sample-select');
+      }
+    }
+
+    function pairDevice() {
+      const btn = document.getElementById('btn-pair-device');
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-1"></i> Connecting Nexora...`;
+      lucide.createIcons();
+
+      setTimeout(() => {
+        isDeviceConnected = true;
+
+        const statusEl = document.getElementById('home-device-status-text');
+        statusEl.className = 'text-xs text-emerald-600 font-semibold flex items-center gap-1.5 mt-0.5';
+        statusEl.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>${translations[currentLang].device_connected}</span>
+        `;
+
+        document.getElementById('home-device-icon-box').className = "w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-inner";
+
+        const actionContainer = document.getElementById('home-device-action-container');
+        actionContainer.innerHTML = `
+          <button onclick="goToStep('step-sample-select')" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow transition flex items-center justify-center space-x-2 active:scale-95">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            <span>START SCAN NOW</span>
+          </button>
+        `;
+
+        const quickBtn = document.getElementById('btn-quick-start-scan');
+        quickBtn.disabled = false;
+        quickBtn.className = "w-full sm:w-auto px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer shadow";
+
+        goToStep('step-sample-select');
+      }, 800);
+    }
+
+    function selectSampleType(type) {
+      currentSelectedSample = type;
+      const text = document.getElementById('insert-instruction-text');
+      if (type === 'Milk') {
+        text.innerText = currentLang === 'mr' ? "दुधाचा नमुना टेस्ट ट्यूब/क्युव्हेटमध्ये भरून Nexora चेंबरमध्ये ठेवा." :
+                         currentLang === 'hi' ? "दूध का नमूना टेस्ट ट्यूब में भरकर Nexora चैंबर में रखें।" :
+                         "Fill sample cuvette with milk and insert into Nexora chamber slot #1.";
+      } else if (type === 'Feed') {
+        text.innerText = currentLang === 'mr' ? "पशुआहाराचे (Pellet/Mash) नमुना Nexora ट्रेमध्ये ठेवा आणि झाकण बंद करा." :
+                         currentLang === 'hi' ? "पशु आहार (Pellet/Mash) का नमूना Nexora ट्रे में रखें और ढक्कन बंद करें।" :
+                         "Place grounded feed sample onto the Nexora optical inspection tray.";
+      } else {
+        text.innerText = currentLang === 'mr' ? "मुरघासाचा (Silage) नमुना Nexora सेन्सर चेंबरमध्ये व्यवस्थित ठेवा." :
+                         currentLang === 'hi' ? "साइलेज (मुरघास) का नमूना Nexora सेंसर स्लॉट में रखें।" :
+                         "Place silage sample in the Nexora chamber slot and secure sensor lid.";
+      }
+      goToStep('step-insert-sample');
+    }
+
+    function startScan() {
+      scanCount++;
+      goToStep('step-scanning');
+      const progressBar = document.getElementById('ai-progress-bar');
+      const progressText = document.getElementById('ai-progress-text');
+      const statusText = document.getElementById('ai-process-status');
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        if (progress > 100) progress = 100;
+
+        progressBar.style.width = progress + '%';
+        progressText.innerText = progress + '%';
+
+        document.getElementById('live-nir').innerText = (1420 + Math.floor(Math.random() * 60)) + ' nm';
+        document.getElementById('live-cond').innerText = (3.9 + Math.random() * 0.6).toFixed(2) + ' mS/cm';
+        document.getElementById('live-od').innerText = (0.75 + Math.random() * 0.15).toFixed(2);
+        document.getElementById('live-temp').innerText = (26.8 + Math.random() * 1.2).toFixed(1) + ' °C';
+
+        if (progress === 40) {
+          statusText.innerText = currentLang === 'mr' ? "AI प्रोसेस: Nexora स्पेक्ट्रल पीकचे विश्लेषण चालू आहे..." :
+                                 currentLang === 'hi' ? "AI प्रोसेस: Nexora स्पेक्ट्रल पीक्स का विश्लेषण जारी..." :
+                                 "AI PROCESSING: Nexora spectral peak feature extraction...";
+        } else if (progress === 80) {
+          statusText.innerText = currentLang === 'mr' ? "AI प्रोसेस: भेसळ व गुणवत्ता निकाल मोजत आहे..." :
+                                 currentLang === 'hi' ? "AI प्रोसेस: मिलावट एवं गुणवत्ता परिणाम जनरेट हो रहा है..." :
+                                 "AI PROCESSING: Computing adulteration & quality index...";
+        }
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(generateResults, 400);
+        }
+      }, 50);
+    }
+
+    // ALTERNATING LOGIC: Scan 1 = Pure, Scan 2 = Adulteration
+    function generateResults() {
+      const isPure = (scanCount % 2 !== 0); // Odd = Pure, Even = Adulterated
+      const nextId = "F00" + (dataset.length + 1);
+
+      if (isPure) {
+        if (currentSelectedSample === 'Milk') {
+          currentTestResult = {
+            sampleId: nextId,
+            feedType: "Pure Cow Milk",
+            moisture: "87",
+            protein: "3.4",
+            fiber: "0",
+            aflatoxin: "0",
+            ph: "6.7",
+            adulteration: "None",
+            status: "Good",
+            score: 94,
+            risk: currentLang === 'mr' ? "सुरक्षित: कोणतीही रासायनिक भेसळ (Water/Urea/Detergent) नाही." :
+                  currentLang === 'hi' ? "सुरक्षित: कोई रासायनिक मिलावट (पानी/यूरिया/डिटर्जेंट) नहीं।" :
+                  "Safe: Zero chemical adulterants detected by Nexora.",
+            recommendation: currentLang === 'mr' ? "दूध सर्वोत्तम गुणवत्तेचे असून डेअरी संकलनासाठी सुरक्षित आहे." :
+                            currentLang === 'hi' ? "दूध सर्वोत्तम गुणवत्ता का है और डेयरी संकलन के लिए सुरक्षित है।" :
+                            "Grade A quality milk. Approved for direct dairy intake."
+          };
+        } else if (currentSelectedSample === 'Silage') {
+          currentTestResult = {
+            sampleId: nextId,
+            feedType: "Corn Silage",
+            moisture: "68",
+            protein: "9",
+            fiber: "24",
+            aflatoxin: "6",
+            ph: "4.0",
+            adulteration: "None",
+            status: "Good",
+            score: 88,
+            risk: currentLang === 'mr' ? "संतुलित किण्वन, बुरशी आढळली नाही." : "संतुलित किण्वन, फफूंद नहीं।",
+            recommendation: currentLang === 'mr' ? "जनावरांच्या आहारासाठी अत्यंत सुरक्षित." : "पशु आहार के लिए अत्यधिक सुरक्षित।"
+          };
+        } else {
+          currentTestResult = {
+            sampleId: nextId,
+            feedType: "Cattle Feed Pellet",
+            moisture: "10",
+            protein: "21",
+            fiber: "14",
+            aflatoxin: "5",
+            ph: "NA",
+            adulteration: "None",
+            status: "Good",
+            score: 91,
+            risk: currentLang === 'mr' ? "ओलावा आणि टॉक्सिन सुरक्षित मर्यादेत आहेत." : "नमी और टॉक्सिन सुरक्षित सीमा में हैं।",
+            recommendation: currentLang === 'mr' ? "पचनास हलका आणि फॅट वाढीस पोषक." : "पाचन के अनुकूल और दूध की गुणवत्ता बढ़ाने में सहायक।"
+          };
+        }
+      } else {
+        if (currentSelectedSample === 'Milk') {
+          currentTestResult = {
+            sampleId: nextId,
+            feedType: "Adulterated Milk",
+            moisture: "94",
+            protein: "1.6",
+            fiber: "0",
+            aflatoxin: "0",
+            ph: "7.9",
+            adulteration: "Water & Urea Detected",
+            status: "Unsafe",
+            score: 36,
+            risk: currentLang === 'mr' ? "धोकादायक: अतिरिक्त पाणी (35%) आणि कृत्रिम युरियाची भेसळ Nexora द्वारे स्पष्टपणे आढळली आहे!" :
+                  currentLang === 'hi' ? "खतरनाक: अतिरिक्त पानी (35%) और कृत्रिम यूरिया की गंभीर मिलावट Nexora द्वारा पाई गई!" :
+                  "CRITICAL: Synthetic Urea & 35% excess water dilution detected by Nexora!",
+            recommendation: currentLang === 'mr' ? "हे दूध तात्काळ नाकारा (REJECT)! मानवी सेवनास आणि संकलनास सक्त मनाई आहे." :
+                            currentLang === 'hi' ? "इस दूध को तत्काल अस्वीकार (REJECT) करें! यह उपयोग के लिए असुरक्षित है।" :
+                            "REJECT BATCH IMMEDIATELY. Highly toxic and non-compliant."
+          };
+        } else if (currentSelectedSample === 'Silage') {
+          currentTestResult = {
+            sampleId: nextId,
+            feedType: "Silage",
+            moisture: "78",
+            protein: "7",
+            fiber: "29",
+            aflatoxin: "24",
+            ph: "5.8",
+            adulteration: "Spoilage & Mould Detected",
+            status: "Unsafe",
+            score: 41,
+            risk: currentLang === 'mr' ? "बुरशी आणि अफ्लाटॉक्सिनचे प्रमाण मर्यादेबाहेर (> 20 ppb) गेले आहे." : "फफूंद और एफ्लाटॉक्सिन का स्तर बहुत अधिक है।",
+            recommendation: currentLang === 'mr' ? "जनावरांना देऊ नका! यामुळे पोट बिघडणे आणि गर्भपाताचा धोका होऊ शकतो." : "पशुओं को न खिलाएं, यह विषैला है।"
+          };
+        } else {
+          currentTestResult = {
+            sampleId: nextId,
+            feedType: "Feed Mash",
+            moisture: "16",
+            protein: "13",
+            fiber: "21",
+            aflatoxin: "22",
+            ph: "NA",
+            adulteration: "Sand & High Aflatoxin",
+            status: "Unsafe",
+            score: 34,
+            risk: currentLang === 'mr' ? "वाळूची भेसळ (Sand Contamination) आणि विषारी बुरशी आढळली." : "रेत की मिलावट और जहरीला फफूंद पाया गया।",
+            recommendation: currentLang === 'mr' ? "हा पशुआहार जनावरांना खाऊ घालू नका. त्वरित परत करा." : "यह चारा तुरंत वापस करें, यह असुरक्षित है।"
+          };
+        }
+      }
+
+      // Result UI
+      document.getElementById('res-sample-badge').innerText = currentTestResult.feedType;
+      document.getElementById('res-sample-id').innerText = "Sample #" + currentTestResult.sampleId;
+      document.getElementById('res-status-text').innerText = currentTestResult.status;
+      document.getElementById('res-score-circle').innerText = currentTestResult.score;
+
+      const banner = document.getElementById('res-status-banner');
+      const bannerIcon = document.getElementById('res-banner-icon');
+      const bannerMsg = document.getElementById('res-banner-msg');
+      const scanBadge = document.getElementById('res-scan-badge');
+
+      scanBadge.innerText = `Scan #${scanCount}`;
+
+      if (isPure) {
+        banner.className = "mb-5 p-3 rounded-2xl flex items-center justify-between text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800";
+        bannerIcon.setAttribute('data-lucide', 'check-circle');
+        bannerMsg.innerText = currentLang === 'mr' ? `स्कॅन #${scanCount}: Nexora द्वारे शुद्ध नमुना प्रमाणित (कोणतीही भेसळ नाही)` :
+                              currentLang === 'hi' ? `स्कैन #${scanCount}: Nexora द्वारा शुद्ध नमूना प्रमाणित (कोई मिलावट नहीं)` :
+                              `Scan #${scanCount}: Pure Sample Verified by Nexora (Zero Adulteration)`;
+        
+        document.getElementById('res-score-circle').className = "w-12 h-12 rounded-full bg-emerald-600 text-white font-black text-lg flex items-center justify-center p-2 shadow";
+        document.getElementById('res-status-text').className = "text-xs font-black text-emerald-600";
+        document.getElementById('res-adulteration').className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1";
+      } else {
+        banner.className = "mb-5 p-3 rounded-2xl flex items-center justify-between text-xs font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 animate-pulse";
+        bannerIcon.setAttribute('data-lucide', 'alert-triangle');
+        bannerMsg.innerText = currentLang === 'mr' ? `स्कॅन #${scanCount}: ⚠️ Nexora अलर्ट! भेसळ आढळली (धोकादायक)` :
+                              currentLang === 'hi' ? `स्कैन #${scanCount}: ⚠️ Nexora अलर्ट! मिलावट पाई गई (असुरक्षित)` :
+                              `Scan #${scanCount}: ⚠️ Nexora Alert! Adulteration Detected (Unsafe Sample)`;
+
+        document.getElementById('res-score-circle').className = "w-12 h-12 rounded-full bg-rose-600 text-white font-black text-lg flex items-center justify-center p-2 shadow";
+        document.getElementById('res-status-text').className = "text-xs font-black text-rose-600";
+        document.getElementById('res-adulteration').className = "text-xs font-bold text-rose-600 dark:text-rose-400 mt-1";
+      }
+
+      document.getElementById('res-moisture').innerText = currentTestResult.moisture + '%';
+      document.getElementById('res-protein').innerText = currentTestResult.protein + (currentTestResult.protein !== 'NA' ? '%' : '');
+      document.getElementById('res-fiber').innerText = currentTestResult.fiber + (currentTestResult.fiber !== 'NA' ? '%' : '');
+      document.getElementById('res-aflatoxin').innerText = currentTestResult.aflatoxin + ' ppb';
+      document.getElementById('res-ph').innerText = currentTestResult.ph;
+      document.getElementById('res-adulteration').innerText = currentTestResult.adulteration;
+
+      document.getElementById('res-risk-analysis').innerText = currentTestResult.risk;
+      document.getElementById('res-ai-recommendation').innerText = currentTestResult.recommendation;
+
+      goToStep('step-results');
+    }
+
+    function saveCurrentTest() {
+      if (currentTestResult) {
+        dataset.push({
+          sampleId: currentTestResult.sampleId,
+          feedType: currentTestResult.feedType,
+          moisture: currentTestResult.moisture,
+          protein: currentTestResult.protein,
+          fiber: currentTestResult.fiber,
+          aflatoxin: currentTestResult.aflatoxin,
+          ph: currentTestResult.ph,
+          adulteration: currentTestResult.adulteration,
+          status: currentTestResult.status
+        });
+        alert(currentLang === 'mr' ? "चाचणी यशस्वीरित्या इतिहासात सेव्ह झाली!" : 
+              currentLang === 'hi' ? "परीक्षण सफलतापूर्वक इतिहास में सेव हो गया!" : 
+              "Test successfully saved to History!");
+        goToStep('step-dashboard');
+      }
+    }
+
+    function renderHomeHistoryTable() {
+      const tbody = document.getElementById('home-history-table-body');
+      const emptyState = document.getElementById('history-empty-state');
+      tbody.innerHTML = '';
+
+      if (dataset.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      dataset.forEach(row => {
+        let badgeClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+        if (row.status === 'Moderate') badgeClass = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+        if (row.status === 'Poor') badgeClass = 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300';
+        if (row.status === 'Unsafe') badgeClass = 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800";
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-bold text-slate-900 dark:text-white">${row.sampleId}</td>
+          <td class="p-3">${row.feedType}</td>
+          <td class="p-3">${row.moisture}</td>
+          <td class="p-3">${row.protein}</td>
+          <td class="p-3">${row.fiber}</td>
+          <td class="p-3">${row.aflatoxin}</td>
+          <td class="p-3">${row.ph}</td>
+          <td class="p-3 font-medium ${row.adulteration !== 'None' ? 'text-rose-600 font-bold' : ''}">${row.adulteration}</td>
+          <td class="p-3">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">
+              ${row.status}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderReportTable() {
+      const tbody = document.getElementById('report-table-body');
+      tbody.innerHTML = '';
+
+      if (dataset.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="9" class="text-center py-6 text-slate-400 font-medium">No test data recorded yet. Perform a scan to view data in this report.</td>`;
+        tbody.appendChild(tr);
+      } else {
+        dataset.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.sampleId}</td>
+            <td>${row.feedType}</td>
+            <td>${row.moisture}</td>
+            <td>${row.protein}</td>
+            <td>${row.fiber}</td>
+            <td>${row.aflatoxin}</td>
+            <td>${row.ph}</td>
+            <td>${row.adulteration}</td>
+            <td>${row.status}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const now = new Date();
+      document.getElementById('report-gen-time').innerText = now.toLocaleString();
+    }
+
+    function downloadCSV() {
+      if (dataset.length === 0) {
+        alert(currentLang === 'mr' ? "डाउनलोड करण्यासाठी कोणताही डेटा उपलब्ध नाही." : "No data available to download.");
+        return;
+      }
+      let csv = "Feed Sample ID,Feed Type,Moisture (%),Protein (%),Fiber (%),Aflatoxin (ppb),pH,Adulteration Detected,Quality Status\n";
+      dataset.forEach(r => {
+        csv += `"${r.sampleId}","${r.feedType}","${r.moisture}","${r.protein}","${r.fiber}","${r.aflatoxin}","${r.ph}","${r.adulteration}","${r.status}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Nexora_Dairy_Quality_Report.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      }
+      setLanguage('en');
+      renderHomeHistoryTable();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
